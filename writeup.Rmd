@@ -1,0 +1,66 @@
+
+Practical Machine Learning /Course Project: Writeup
+====================================================
+
+##Summary
+
+The aim of this report is the describe the steps and results of building models and predicting the "classe" variable. 
+
+
+
+##Steps
+
+* Reading training and testing data set in
+
+```{r}
+test<-read.csv("pml-testing.csv")
+train<-read.csv("pml-training.csv")
+```
+
+* Splitting training dataset into training and testing set (60/40) 
+
+```{r}
+library(caret)
+library(kernlab)
+trainIndex <- createDataPartition(train$classe, p = 0.60)[[1]]
+training = train[trainIndex,]
+testing = train[-trainIndex,]
+```
+
+* Creating 3 different models (forarm, belt, and arm) on the basis of cross-validation
+
+```{r}
+modelforarm<-train(classe ~gyros_forearm_x+gyros_forearm_y+gyros_forearm_z+accel_forearm_x+accel_forearm_y+accel_forearm_z+magnet_forearm_x+magnet_forearm_y+magnet_forearm_z, data=training, trControl = trainControl(method = "cv"))
+predictedforarm <- predict(modelforarm, newdata=testing)
+confusionMatrix(predictedforarm, testing$classe)
+
+modelbelt<-train(classe ~gyros_belt_x+gyros_belt_y+gyros_belt_z+accel_belt_x+accel_belt_y+accel_belt_z+magnet_belt_x+magnet_belt_y+magnet_belt_z, data=training, trControl = trainControl(method = "cv"))
+
+modelarm<-train(classe ~gyros_arm_x+gyros_arm_y+gyros_arm_z+accel_arm_x+accel_arm_y+accel_arm_z+magnet_arm_x+magnet_arm_y+magnet_arm_z, data=training, trControl = trainControl(method = "cv"))
+```
+
+* Calculating accuracy of the 3 models (Forarm, Belt, Arm)
+
+** Forarm
+```{r}
+predictedforarm <- predict(modelforarm, newdata=testing)
+confusionMatrix(predictedforarm, testing$classe)
+```
+
+** Belt
+```{r}
+predictedbelt <- predict(modelbelt, newdata=testing)
+confusionMatrix(predictedbelt, testing$classe)
+```
+
+** Arm
+```{r}
+predictedarm <- predict(modelarm, newdata=testing)
+confusionMatrix(predictedarm, testing$classe)
+```
+##Conclusion
+
+My models could predict the classe variable with ca. 0.7 - 0.8 accuracy.
+
+I have selected these models because the moving of these body parts during the exercises could definitely affect the quality of the exercises.
+
